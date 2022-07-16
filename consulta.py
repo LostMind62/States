@@ -68,6 +68,7 @@ if __name__ =="__main__":
         result = datas(response)
         results.append(result)    
     result = pd.DataFrame(results, index=list(range(len(results))))
+    print(result.describe())
     export_dataframe_json(result)
     conexion.createdb()
     conexion.createTable()

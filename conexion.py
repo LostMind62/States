@@ -10,7 +10,7 @@ def createTable():
     conn=sql.connect("states.db")
     cur= conn.cursor()
     cur.execute(
-        """CREATE TABLE state (ID integer primary key, region varchar(255), city_name varchar(20) , lenguage varchar(20), time REAL); """
+        """CREATE TABLE IF NOT EXISTS state (ID integer primary key, region varchar(255), city_name varchar(20) , lenguage varchar(20), time REAL); """
     )
     conn.commit()
     conn.close()
