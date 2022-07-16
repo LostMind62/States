@@ -5,7 +5,11 @@ import numpy as np
 import pandas as pd
 import hashlib
 from datetime import datetime
+import conexion
+# metodos de tratamiento de datos
 #Africa, Americas, Asia, Europe, Oceania
+
+# consulta principal
 def get_response_region(region):
     response = requests.get("https://restcountries.com/v3.1/region/"+region)
     if response.status_code == 200:
@@ -14,6 +18,7 @@ def get_response_region(region):
         response = []
     return response
 
+# lenguage´s de cada pais
 def get_lenguage(response):
     dict_lng=""
     if response['languages']:
@@ -25,8 +30,8 @@ def get_lenguage(response):
         dict_lng=""
     return dict_lng
 
+# construccion de datos
 def datas(response):
-    # rows=pd.DataFrame(columns=['region', 'city name', 'Lenguaje','Time'])
     rows=[]
     tiempo = lambda x:  float(datetime.now().strftime('%S.%f')) - float(x.strftime('%S.%f'))
     if response != []:
@@ -37,7 +42,7 @@ def datas(response):
             time.sleep(.00000000000000000000000000002)
             row= {
                 'region' :x['region'],
-                'city name' :x['name']['official'],
+                'city name' :x['name']['official'].replace("'","-"),
                 'Lenguaje' :hash_object,
                 'Time': tiempo(dt),
             }
@@ -45,6 +50,14 @@ def datas(response):
     else:
         rows = []
     return rows
+
+# exportacion a json
+def export_dataframe_json(df):
+    result = df.to_json(orient="split")
+    parsed = json.loads(result)
+    parsed = json.dumps(parsed, indent=4,) 
+    with open('data.json', 'w') as outfile:
+        json.dump(parsed, outfile)
         
            
 if __name__ =="__main__":
@@ -55,5 +68,7 @@ if __name__ =="__main__":
         result = datas(response)
         results.append(result)    
     result = pd.DataFrame(results, index=list(range(len(results))))
-
-        # res = pd.concat([res, result])
+    export_dataframe_json(result)
+    conexion.createdb()
+    conexion.createTable()
+    conexion.inserts(results)
